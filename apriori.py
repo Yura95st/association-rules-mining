@@ -43,8 +43,6 @@ class Apriori:
         return result
 
     def _get_rules(self, candidates):
-        rules = {}
-
         for cand in candidates:
             all_subsets = self._get_all_subsets(cand)
 
@@ -59,11 +57,7 @@ class Apriori:
 
                 tail = cand - head
 
-                rules[(head, tail)] = confidence
-
-        max_confidence = max(rules.values())
-
-        return [rule for rule in rules if rules[rule] == max_confidence]
+                yield (head, tail)
 
     def _get_frequent_candidates(self, candidates):
         return {c for c in candidates if self._support[c] >= self._min_support}

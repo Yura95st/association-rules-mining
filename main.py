@@ -1,5 +1,4 @@
 import csv
-import operator
 from apriori import Apriori
 
 
@@ -15,7 +14,7 @@ def get_transactions_from_file(filename):
     return result
 
 
-def main(filename='data/data.txt', min_support=4, min_confidence=0):
+def main(filename='data/data.txt', min_support=4, min_confidence=1):
     transactions = get_transactions_from_file(filename)
 
     apriori = Apriori(transactions, min_support, min_confidence)
