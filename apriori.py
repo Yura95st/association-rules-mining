@@ -1,4 +1,5 @@
 from collections import defaultdict
+from collections import deque
 
 
 class Apriori:
@@ -38,7 +39,8 @@ class Apriori:
             candidates = self._generate_candidates(frequent_candidates)
             candidates = self._prune(candidates, nonfrequent_candidates)
 
-            self._calculate_support(candidates)
+            # self._calculate_support(candidates)
+            self._calculate_support_new(candidates)
 
         return result
 
@@ -81,6 +83,65 @@ class Apriori:
             for transaction in self._transactions:
                 if cand.issubset(transaction):
                     self._support[cand] += 1
+
+    def _calculate_support_new(self, candidates):
+        if not candidates:
+            return
+
+        hash_size = len(list(candidates)[0])
+
+        tree = defaultdict(list)
+        tree['level'] = 0
+
+        for cand in candidates:
+            node = tree
+            key = -1
+
+            while True:
+                key = int(sorted(cand)[node['level']]) % hash_size
+                if isinstance(node[key], list):
+                    break
+                node = node[key]
+
+            node[key].append(cand)
+
+            if len(node[key]) > hash_size > node['level'] + 1:
+                new_node = defaultdict(list)
+                new_node['level'] = node['level'] + 1
+
+                for val in node[key]:
+                    new_key = int(sorted(val)[new_node['level']]) % hash_size
+                    new_node[new_key].append(val)
+
+                node[key] = new_node
+
+        # for t in self._transactions:
+        #     visited_candidates = set()
+        #     queue = deque()
+
+        #     queue.append((sorted(t), tree))
+
+        #     while queue:
+        #         transaction, node = queue.popleft()
+
+        #         if isinstance(node, list):
+        #             visited_candidates.update(node)
+        #             continue
+
+        #         while transaction:
+        #             if not transaction:
+        #                 break
+
+        #             key = int(transaction[0]) % hash_size
+
+        #             transaction = transaction[1:]
+
+        #             queue.append((transaction, node[key]))
+
+        #     x = list([cand for cand in visited_candidates if cand.issubset(t)])
+
+        #     for cand in x:
+        #         self._support[cand] += 1
 
     def _get_all_subsets(self, my_set):
         result = [[]]
